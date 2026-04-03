@@ -99,14 +99,16 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds OpenTelemetry tracing with the Consumer.Template ActivitySource.
+    /// Adds OpenTelemetry tracing with a custom ActivitySource provided by the implementer.
     /// Exporters: OTLP (→ Elastic APM) + Console (dev).
     /// Configure the OTLP endpoint via <c>OTEL_EXPORTER_OTLP_ENDPOINT</c> env var.
     /// </summary>
-    public static OpenTelemetryBuilder AddConsumerTracing(this OpenTelemetryBuilder builder)
+    public static OpenTelemetryBuilder AddConsumerTracing(this OpenTelemetryBuilder builder, string activitySourceName)
     {
+        Messaging.Core.Observability.ConsumerActivitySource.Initialize(activitySourceName);
+
         return builder.WithTracing(tracing => tracing
-            .AddSource("Consumer.Template")
+            .AddSource(activitySourceName)
             .AddOtlpExporter()
             .AddConsoleExporter());
     }

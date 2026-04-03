@@ -13,7 +13,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Starting Consumer.Template host");
+    Log.Information("Starting Messaging.Sample host");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +54,7 @@ try
     // OpenTelemetry
     builder.Services
         .AddOpenTelemetry()
-        .AddConsumerTracing();
+        .AddConsumerTracing("Messaging.Sample");
 
     var app = builder.Build();
 
@@ -64,7 +64,6 @@ try
 
     // Health endpoints
     app.MapHealthEndpoint();
-    
     app.MapGet("/", () => Results.Redirect("/health/live"));
 
     await app.RunAsync();

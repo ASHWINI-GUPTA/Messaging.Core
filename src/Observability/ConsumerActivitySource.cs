@@ -5,11 +5,19 @@ namespace Messaging.Core.Observability;
 /// <summary>
 /// Central OpenTelemetry <see cref="ActivitySource"/> for the consumer template.
 /// All consumer spans are created here and follow the OpenTelemetry messaging semantic conventions.
-/// The source name "Consumer.Template" must be registered in AddOpenTelemetry().WithTracing().
+/// The source name "Messaging.Core" must be registered in AddOpenTelemetry().WithTracing().
 /// </summary>
 public static class ConsumerActivitySource
 {
-    private static readonly ActivitySource Source = new("Consumer.Template", "1.0.0");
+    private static ActivitySource _source = new("Messaging.Core", "1.0.0");
+    
+    /// <summary>
+    /// Initializes the ActivitySource with a custom name provided by the implementer.
+    /// </summary>
+    public static void Initialize(string sourceName, string version = "1.0.0")
+    {
+        _source = new ActivitySource(sourceName, version);
+    }
 
     /// <summary>
     /// Starts a new tracing span for a single message dispatch.
@@ -20,7 +28,7 @@ public static class ConsumerActivitySource
         string messageId,
         string? correlationId = null)
     {
-        var activity = Source.StartActivity(
+        var activity = _source.StartActivity(
             name: $"{queueName} process",
             kind: ActivityKind.Consumer);
 
