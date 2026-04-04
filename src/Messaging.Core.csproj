@@ -50,14 +50,6 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.*" />
 
     <PackageReference Include="Polly.Core" Version="8.*" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.*" />
-
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.*" />
-    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.*" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.*" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.*" />
 
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.*" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.*" />
@@ -65,7 +57,6 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.*" />
 
     <PackageReference Include="AspNetCore.HealthChecks.RabbitMQ" Version="9.*" />
-    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
   </ItemGroup>
 
 </Project>

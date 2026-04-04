@@ -26,12 +26,12 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.*" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.*" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.*" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.*" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.*" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
     
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
   </ItemGroup>
