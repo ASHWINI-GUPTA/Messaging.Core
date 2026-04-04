@@ -14,17 +14,6 @@ using System.Text.Json;
 namespace Messaging.Core.RabbitMq;
 
 /// <summary>
-/// Internal marker interface so the DI container can resolve all registered consumer services
-/// without knowing the generic type argument.
-/// </summary>
-public interface IConsumerService
-{
-    string QueueName { get; }
-    Task StartAsync(CancellationToken cancellationToken);
-    Task StopAsync(CancellationToken cancellationToken);
-}
-
-/// <summary>
 /// Core RabbitMQ consumer engine for a single message type.
 /// Responsibilities:
 ///   1. Gate evaluation — pause consumption when external dependencies are unavailable.

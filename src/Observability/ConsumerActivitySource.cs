@@ -14,7 +14,7 @@ public static class ConsumerActivitySource
     /// <summary>
     /// Initializes the ActivitySource with a custom name provided by the implementer.
     /// </summary>
-    public static void Initialize(string sourceName, string version = "1.0.0")
+    public static void Initialize(string sourceName, string version)
     {
         _source = new ActivitySource(sourceName, version);
     }

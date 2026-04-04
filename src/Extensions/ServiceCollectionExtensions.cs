@@ -103,9 +103,15 @@ public static class ServiceCollectionExtensions
     /// Exporters: OTLP (→ Elastic APM) + Console (dev).
     /// Configure the OTLP endpoint via <c>OTEL_EXPORTER_OTLP_ENDPOINT</c> env var.
     /// </summary>
-    public static OpenTelemetryBuilder AddConsumerTracing(this OpenTelemetryBuilder builder, string activitySourceName)
+    /// <param name="builder">The OpenTelemetry builder.</param>
+    /// <param name="activitySourceName">The name of the ActivitySource.</param>
+    /// <param name="activitySourceVersion">The version of the ActivitySource.</param>
+    public static OpenTelemetryBuilder AddConsumerTracing(
+        this OpenTelemetryBuilder builder, 
+        string activitySourceName, 
+        string activitySourceVersion = "1.0.0")
     {
-        Messaging.Core.Observability.ConsumerActivitySource.Initialize(activitySourceName);
+        Observability.ConsumerActivitySource.Initialize(activitySourceName, activitySourceVersion);
 
         return builder.WithTracing(tracing => tracing
             .AddSource(activitySourceName)
