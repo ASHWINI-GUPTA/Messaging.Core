@@ -6,6 +6,9 @@ on:
       - 'v*.*.*'       # Trigger when tags like v1.0.0 are pushed
   workflow_dispatch:   # Provide manual trigger option from GitHub Actions UI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
