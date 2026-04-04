@@ -6,9 +6,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Messaging.Core</RootNamespace>
     <AssemblyName>Messaging.Core</AssemblyName>
+    <PackageId>Messaging.Queue.Core</PackageId>
     
     <!-- NuGet Package Properties -->
-    <Title>Messaging.Core</Title>
+    <Title>Messaging.Queue.Core</Title>
     <Description>A broker-agnostic messaging template for high-availability environments.</Description>
     <Authors>ASHWINI-GUPTA</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
