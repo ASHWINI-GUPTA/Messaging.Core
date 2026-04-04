@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -6,6 +6,16 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Messaging.Core</RootNamespace>
     <AssemblyName>Messaging.Core</AssemblyName>
+    
+    <!-- NuGet Package Properties -->
+    <Title>Messaging.Core</Title>
+    <Description>A broker-agnostic messaging template for high-availability environments.</Description>
+    <Authors>ASHWINI-GUPTA</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ASHWINI-GUPTA/Messaging.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ASHWINI-GUPTA/Messaging.Core</RepositoryUrl>
+    <PackageTags>messaging;rabbitmq;opentelemetry;kubernetes;consumer</PackageTags>
+    
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisMode>All</AnalysisMode>
     <!-- Suppress rules that conflict with intentional design decisions:
