@@ -43,8 +43,51 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers a typed consumer and returns a fluent <see cref="ConsumerBuilder{TMessage}"/>
-    /// for chaining gates and per-consumer behaviors.
+    /// Registers a typed consumer bound to an exchange via a routing key.
+    /// This is the primary registration pattern — the exchange and queue binding
+    /// are declared automatically during topology setup.
+    /// </summary>
+    /// <typeparam name="TMessage">The message type to consume.</typeparam>
+    /// <typeparam name="TConsumer">The consumer implementation.</typeparam>
+    /// <param name="exchangeName">The exchange to bind to.</param>
+    /// <param name="routingKey">The routing key for the exchange → queue binding.</param>
+    /// <param name="queueName">Optional queue name. Defaults to <paramref name="routingKey"/> if not specified.</param>
+    /// <param name="exchangeType">Exchange type: direct, topic, fanout, headers. Default: "direct".</param>
+    public static ConsumerBuilder<TMessage> AddConsumer<TMessage, TConsumer>(
+        this IServiceCollection services,
+        string exchangeName,
+        string routingKey,
+        string? queueName = null,
+        string exchangeType = "direct")
+        where TMessage : IMessage
+        where TConsumer : class, IMessageConsumer<TMessage>
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(exchangeName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(routingKey);
+
+        services
+            .AddOptions<ConsumerOptions>()
+            .Configure(o =>
+            {
+                o.ExchangeName = exchangeName;
+                o.RoutingKey = routingKey;
+                o.ExchangeType = exchangeType;
+
+                if (!string.IsNullOrEmpty(queueName))
+                    o.QueueName = queueName;
+            })
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<IMessageConsumer<TMessage>, TConsumer>();
+
+        return new ConsumerBuilder<TMessage>(services);
+    }
+
+    /// <summary>
+    /// Registers a typed consumer for direct queue consumption (no exchange binding).
+    /// Use this for the rare case where messages are published directly to a queue
+    /// via the default exchange.
     /// </summary>
     /// <typeparam name="TMessage">The message type to consume.</typeparam>
     /// <typeparam name="TConsumer">The consumer implementation.</typeparam>
@@ -55,6 +98,8 @@ public static class ServiceCollectionExtensions
         where TMessage : IMessage
         where TConsumer : class, IMessageConsumer<TMessage>
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(queueName);
+
         services
             .AddOptions<ConsumerOptions>()
             .Configure(o => o.QueueName = queueName)

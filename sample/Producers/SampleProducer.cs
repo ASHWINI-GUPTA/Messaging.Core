@@ -37,7 +37,7 @@ public sealed class SampleProducer(
                     message.Priority);
 #pragma warning restore CA1873 // Avoid potentially expensive logging
 
-                await publisher.PublishAsync(message, "sample-queue", stoppingToken);
+                await publisher.PublishAsync(message, "sample-exchange", "sample-queue", stoppingToken);
             }
             catch (Exception ex)
             {

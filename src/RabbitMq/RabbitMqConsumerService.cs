@@ -17,11 +17,12 @@ namespace Messaging.Core.RabbitMq;
 /// Core RabbitMQ consumer engine for a single message type.
 /// Responsibilities:
 ///   1. Gate evaluation — pause consumption when external dependencies are unavailable.
-///   2. Queue + DLQ topology declaration.
-///   3. Message deserialization and consumer pipeline dispatch.
-///   4. Retry with exponential back-off (Polly v8).
-///   5. Dead-letter routing after max retries.
-///   6. Graceful shutdown — drain in-flight messages before closing the channel.
+///   2. Exchange declaration + queue binding (when exchange-based consumption is configured).
+///   3. Queue + DLQ topology declaration.
+///   4. Message deserialization and consumer pipeline dispatch.
+///   5. Retry with exponential back-off (Polly v8).
+///   6. Dead-letter routing after max retries.
+///   7. Graceful shutdown — drain in-flight messages before closing the channel.
 /// </summary>
 public sealed class RabbitMqConsumerService<TMessage>(
     IRabbitMqConnection connection,
@@ -45,7 +46,9 @@ public sealed class RabbitMqConsumerService<TMessage>(
     private Task _gateMonitorTask = Task.CompletedTask;
     private CancellationTokenSource? _gateMonitorCts;
 
-    public string QueueName => _options.QueueName;
+    public string QueueName => _options.ResolvedQueueName;
+
+    public string? ExchangeName => _options.ExchangeName;
 
     /// <summary>
     /// Starts consuming from RabbitMQ, waiting for all gates to open first.
@@ -257,6 +260,25 @@ public sealed class RabbitMqConsumerService<TMessage>(
             autoDelete: false,
             arguments: queueArgs,
             cancellationToken: cancellationToken);
+
+        // Declare exchange and bind queue when exchange-based consumption is configured
+        if (_options.HasExchangeBinding)
+        {
+            await _channel.ExchangeDeclareAsync(
+                exchange: _options.ExchangeName!,
+                type: _options.ExchangeType,
+                durable: true,
+                autoDelete: false,
+                cancellationToken: cancellationToken);
+
+            await _channel.QueueBindAsync(
+                queue: QueueName,
+                exchange: _options.ExchangeName!,
+                routingKey: _options.RoutingKey!,
+                cancellationToken: cancellationToken);
+
+            RabbitMqConsumerServiceLog.ExchangeBound(logger, QueueName, _options.ExchangeName!, _options.RoutingKey!);
+        }
     }
 
     private async Task BeginConsumingAsync(CancellationToken cancellationToken)
@@ -427,4 +449,8 @@ internal static partial class RabbitMqConsumerServiceLog
     [LoggerMessage(Level = LogLevel.Error,
         Message = "Message {MessageId} ({MessageType}) failed after all retries. Routing to DLQ.")]
     internal static partial void MessageFailed(ILogger logger, Exception ex, string messageId, string messageType);
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Queue {Queue} bound to exchange {Exchange} with routing key {RoutingKey}")]
+    internal static partial void ExchangeBound(ILogger logger, string queue, string exchange, string routingKey);
 }

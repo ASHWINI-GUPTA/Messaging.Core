@@ -34,11 +34,13 @@ try
         .AddGlobalConsumerBehavior(typeof(TracingBehavior<>));
 
     // Consumers
-    // Pattern: .AddConsumer<TMessage, TConsumer>("queue-name")
+    // Pattern: .AddConsumer<TMessage, TConsumer>("exchange", "routingKey")
     //              .WithGate<TGate>()           ← pause if external dependency is down
     //              .WithBehavior<TBehavior>()   ← per-consumer pipeline step
     builder.Services
-        .AddConsumer<SampleMessage, SampleConsumer>("sample-queue")
+        .AddConsumer<SampleMessage, SampleConsumer>(
+            exchangeName: "sample-exchange",
+            routingKey: "sample-queue")
         .WithGate<SampleGate>();
 
     // Sample Producer

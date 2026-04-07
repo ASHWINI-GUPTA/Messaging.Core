@@ -12,6 +12,11 @@ public interface IConsumerService
     string QueueName { get; }
 
     /// <summary>
+    /// Gets the exchange name this consumer is bound to, or null for direct queue consumption.
+    /// </summary>
+    string? ExchangeName { get; }
+
+    /// <summary>
     /// Starts the consumer service asynchronously.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the start operation.</param>
