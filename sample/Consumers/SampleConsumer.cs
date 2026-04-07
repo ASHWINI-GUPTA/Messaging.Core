@@ -37,7 +37,7 @@ public sealed class SampleConsumer(
                 Payload: $"Follow-up from {message.MessageId}",
                 Priority: 0);
 
-            await publisher.PublishAsync(followUp, "sample-followup-queue", cancellationToken);
+            await publisher.PublishToQueueAsync(followUp, "sample-followup-queue", cancellationToken);
         }
     }
 }

@@ -51,7 +51,7 @@ internal sealed class ConsumerBackgroundService(
     {
         try
         {
-            ConsumerBackgroundServiceLog.StartingQueue(logger, consumer.QueueName);
+            ConsumerBackgroundServiceLog.StartingQueue(logger, consumer.QueueName, consumer.ExchangeName);
             await consumer.StartAsync(cancellationToken);
         }
         catch (OperationCanceledException)
@@ -70,7 +70,7 @@ internal sealed class ConsumerBackgroundService(
         try
         {
             await consumer.StopAsync(cancellationToken);
-            ConsumerBackgroundServiceLog.Stopped(logger, consumer.QueueName);
+            ConsumerBackgroundServiceLog.Stopped(logger, consumer.QueueName, consumer.ExchangeName);
         }
         catch (Exception ex)
         {
@@ -99,16 +99,16 @@ internal static partial class ConsumerBackgroundServiceLog
     internal static partial void ShutdownSignal(ILogger logger);
 
     [LoggerMessage(Level = LogLevel.Information,
-        Message = "Starting consumer for queue '{Queue}'")]
-    internal static partial void StartingQueue(ILogger logger, string queue);
+        Message = "Starting consumer for queue '{Queue}' (exchange={Exchange})")]
+    internal static partial void StartingQueue(ILogger logger, string queue, string? exchange);
 
     [LoggerMessage(Level = LogLevel.Error,
         Message = "Consumer for queue '{Queue}' failed to start")]
     internal static partial void StartFailed(ILogger logger, Exception ex, string queue);
 
     [LoggerMessage(Level = LogLevel.Information,
-        Message = "Consumer for queue '{Queue}' stopped")]
-    internal static partial void Stopped(ILogger logger, string queue);
+        Message = "Consumer for queue '{Queue}' stopped (exchange={Exchange})")]
+    internal static partial void Stopped(ILogger logger, string queue, string? exchange);
 
     [LoggerMessage(Level = LogLevel.Error,
         Message = "Error stopping consumer for queue '{Queue}'")]
