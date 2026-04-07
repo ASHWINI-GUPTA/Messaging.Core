@@ -13,7 +13,7 @@ public sealed class SampleProducer(
         logger.LogInformation("SampleProducer starting...");
 
         // Give the consumer a moment to start up and connect to the broker
-        await Task.Delay(2000, stoppingToken);
+        await Task.Delay(15000, stoppingToken);
 
         int count = 0;
 
