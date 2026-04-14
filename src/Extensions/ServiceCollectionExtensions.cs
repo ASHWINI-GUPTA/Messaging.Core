@@ -65,8 +65,11 @@ public static class ServiceCollectionExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(exchangeName);
         ArgumentException.ThrowIfNullOrWhiteSpace(routingKey);
 
+        string optionsName = typeof(TConsumer).FullName!;
+
         services
-            .AddOptions<ConsumerOptions>()
+            .AddOptions<ConsumerOptions>(optionsName)
+            .BindConfiguration(ConsumerOptions.SectionName)
             .Configure(o =>
             {
                 o.ExchangeName = exchangeName;
@@ -81,7 +84,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IMessageConsumer<TMessage>, TConsumer>();
 
-        return new ConsumerBuilder<TMessage>(services);
+        return new ConsumerBuilder<TMessage>(services, optionsName);
     }
 
     /// <summary>
@@ -100,15 +103,18 @@ public static class ServiceCollectionExtensions
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(queueName);
 
+        string optionsName = typeof(TConsumer).FullName!;
+
         services
-            .AddOptions<ConsumerOptions>()
+            .AddOptions<ConsumerOptions>(optionsName)
+            .BindConfiguration(ConsumerOptions.SectionName)
             .Configure(o => o.QueueName = queueName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
         services.AddScoped<IMessageConsumer<TMessage>, TConsumer>();
 
-        return new ConsumerBuilder<TMessage>(services);
+        return new ConsumerBuilder<TMessage>(services, optionsName);
     }
 
     /// <summary>

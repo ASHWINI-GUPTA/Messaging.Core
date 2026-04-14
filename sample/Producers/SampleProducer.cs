@@ -24,8 +24,14 @@ public sealed class SampleProducer(
             var message = new SampleMessage(
                 MessageId: Guid.NewGuid(),
                 Timestamp: DateTimeOffset.UtcNow,
-                Payload: $"Periodic message #{count} from SampleProducer",
+                Payload: $"Periodic message #{count} from SampleProducer for SampleConsumer",
                 Priority: (count % 10 == 0) ? 9 : 1
+            );
+
+            var hardMessage = new HardMessage(
+                MessageId: Guid.NewGuid(),
+                Timestamp: DateTimeOffset.UtcNow,
+                Payload: $"Periodic message #{count} from SampleProducer for HardConsumer"
             );
 
             try
@@ -35,9 +41,17 @@ public sealed class SampleProducer(
                     "Publishing SampleMessage {MessageId} (Priority: {Priority})",
                     message.MessageId,
                     message.Priority);
-#pragma warning restore CA1873 // Avoid potentially expensive logging
 
                 await publisher.PublishAsync(message, "sample-exchange", "sample-queue", stoppingToken);
+
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
+                logger.LogInformation(
+                    "Publishing HardMessage {MessageId}",
+                    hardMessage.MessageId);
+
+                await publisher.PublishAsync(hardMessage, "sample-exchange", "ashwini-queue", stoppingToken);
+#pragma warning restore CA1873 // Avoid potentially expensive logging
             }
             catch (Exception ex)
             {
@@ -47,7 +61,7 @@ public sealed class SampleProducer(
                     message.MessageId);
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(.5), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
         }
     }
 }
