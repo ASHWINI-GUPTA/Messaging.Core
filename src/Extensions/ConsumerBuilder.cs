@@ -14,12 +14,14 @@ namespace Messaging.Core.Extensions;
 public sealed class ConsumerBuilder<TMessage> where TMessage : IMessage
 {
     private readonly IServiceCollection _services;
+    private readonly string _optionsName;
     private readonly List<Type> _behaviorTypes = [];
     private readonly List<Type> _gateTypes = [];
 
-    internal ConsumerBuilder(IServiceCollection services)
+    internal ConsumerBuilder(IServiceCollection services, string optionsName)
     {
         _services = services;
+        _optionsName = optionsName;
         RegisterConsumerService();
     }
 
@@ -50,7 +52,8 @@ public sealed class ConsumerBuilder<TMessage> where TMessage : IMessage
         {
             var connection = sp.GetRequiredService<IRabbitMqConnection>();
             var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
-            var options = sp.GetRequiredService<IOptions<ConsumerOptions>>();
+            var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<ConsumerOptions>>();
+            var options = Options.Create(optionsMonitor.Get(_optionsName));
             var rabbitOptions = sp.GetRequiredService<IOptions<RabbitMqOptions>>();
             var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<RabbitMqConsumerService<TMessage>>>();
 

@@ -41,6 +41,12 @@ try
         .AddConsumer<SampleMessage, SampleConsumer>(
             exchangeName: "sample-exchange",
             routingKey: "sample-queue")
+        .WithGate<RandomGate>();
+
+    builder.Services
+        .AddConsumer<HardMessage, HardConsumer>(
+            exchangeName: "sample-exchange",
+            routingKey: "hard-queue")
         .WithGate<SampleGate>();
 
     // Sample Producer
