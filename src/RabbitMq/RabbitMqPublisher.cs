@@ -22,6 +22,7 @@ public sealed class RabbitMqPublisher(
         TMessage message,
         string exchangeName,
         string routingKey,
+        MessagePublishOptions? options = null,
         CancellationToken cancellationToken = default)
         where TMessage : IMessage
     {
@@ -30,7 +31,7 @@ public sealed class RabbitMqPublisher(
         ArgumentNullException.ThrowIfNull(message);
 
         var body = SerializeMessage(message);
-        var props = CreateBasicProperties<TMessage>(message);
+        var props = CreateBasicProperties<TMessage>(message, options);
 
         await using var channel = await connection.CreateChannelAsync(cancellationToken);
 
@@ -49,6 +50,7 @@ public sealed class RabbitMqPublisher(
     public async Task PublishToQueueAsync<TMessage>(
         TMessage message,
         string queueName,
+        MessagePublishOptions? options = null,
         CancellationToken cancellationToken = default)
         where TMessage : IMessage
     {
@@ -56,7 +58,7 @@ public sealed class RabbitMqPublisher(
         ArgumentNullException.ThrowIfNull(message);
 
         var body = SerializeMessage(message);
-        var props = CreateBasicProperties<TMessage>(message);
+        var props = CreateBasicProperties<TMessage>(message, options);
 
         await using var channel = await connection.CreateChannelAsync(cancellationToken);
 
@@ -71,22 +73,34 @@ public sealed class RabbitMqPublisher(
         RabbitMqPublisherLog.PublishedToQueue(logger, typeof(TMessage).Name, message.MessageId, queueName);
     }
 
-    private static BasicProperties CreateBasicProperties<TMessage>(TMessage message)
+    private static BasicProperties CreateBasicProperties<TMessage>(TMessage message, MessagePublishOptions? options = null)
         where TMessage : IMessage
     {
-        return new BasicProperties
+        var headers = new Dictionary<string, object?>
+        {
+            ["x-message-type"] = typeof(TMessage).Name,
+            ["x-published-at"] = DateTimeOffset.UtcNow.ToString("O"),
+        };
+
+        // Merge caller-supplied headers (caller values win on collision)
+        if (options is not null)
+            foreach (var (k, v) in options.Headers)
+                headers[k] = v;
+
+        var props = new BasicProperties
         {
             Persistent = true,
             ContentType = "application/json",
             ContentEncoding = "utf-8",
             MessageId = message.MessageId.ToString(),
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
-            Headers = new Dictionary<string, object?>
-            {
-                ["x-message-type"] = typeof(TMessage).Name,
-                ["x-published-at"] = DateTimeOffset.UtcNow.ToString("O"),
-            }
+            Headers = headers,
         };
+
+        if (options?.Priority is { } priority)
+            props.Priority = priority;
+
+        return props;
     }
 
     private static ReadOnlyMemory<byte> SerializeMessage<TMessage>(TMessage message)
