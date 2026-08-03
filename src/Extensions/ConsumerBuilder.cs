@@ -43,6 +43,29 @@ public sealed class ConsumerBuilder<TMessage> where TMessage : IMessage
         return this;
     }
 
+    /// <summary>
+    /// Configures all RabbitMQ-specific options for this consumer's queue and registration
+    /// using a fluent configure action.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// .WithRabbitMqOptions(mq => mq
+    ///     .WithMaxPriority(10)
+    ///     .WithMessageTtl(TimeSpan.FromHours(24))
+    ///     .WithConsumerPriority(5))
+    /// </code>
+    /// </example>
+    public ConsumerBuilder<TMessage> WithRabbitMqOptions(Action<RabbitMqConsumerOptions> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+        _services.PostConfigure<ConsumerOptions>(_optionsName, o =>
+        {
+            o.RabbitMqOptions ??= new RabbitMqConsumerOptions();
+            configure(o.RabbitMqOptions);
+        });
+        return this;
+    }
+
     /// <summary>Return to IServiceCollection for further registrations.</summary>
     public IServiceCollection Services => _services;
 

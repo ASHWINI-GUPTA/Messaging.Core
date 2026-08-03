@@ -252,6 +252,22 @@ public sealed class RabbitMqConsumerService<TMessage>(
             RabbitMqConsumerServiceLog.DlqConfigured(logger, dlqName);
         }
 
+        // Merge user-supplied RabbitMQ x-arguments. DLQ args take precedence on collision
+        // so that dead-letter routing can never be accidentally overridden.
+        if (_options.RabbitMqOptions is { } rabbitMqOptions)
+        {
+            queueArgs ??= new Dictionary<string, object?>();
+            foreach (var (k, v) in rabbitMqOptions.QueueArguments)
+                queueArgs.TryAdd(k, v);
+
+            if (rabbitMqOptions.MaxPriority is { } p)
+            {
+                RabbitMqConsumerServiceLog.QueuePriorityConfigured(logger, QueueName, p);
+                if (p > 10)
+                    RabbitMqConsumerServiceLog.QueuePriorityExceedsRecommendedLimit(logger, QueueName, p);
+            }
+        }
+
         // Declare the main queue
         await _channel.QueueDeclareAsync(
             queue: QueueName,
@@ -286,9 +302,19 @@ public sealed class RabbitMqConsumerService<TMessage>(
         var consumer = new AsyncEventingBasicConsumer(_channel!);
         consumer.ReceivedAsync += OnMessageReceivedAsync;
 
+        // Pass x-priority when ConsumerPriority is configured so this consumer
+        // is preferred over lower-priority consumers competing on the same queue.
+        Dictionary<string, object?>? consumerArgs = _options.RabbitMqOptions?.ConsumerPriority is { } cp
+            ? new() { ["x-priority"] = (int)cp }
+            : null;
+
         _consumerTag = await _channel!.BasicConsumeAsync(
             queue: QueueName,
             autoAck: false,
+            consumerTag: string.Empty,
+            noLocal: false,
+            exclusive: false,
+            arguments: consumerArgs,
             consumer: consumer,
             cancellationToken: cancellationToken);
 
@@ -453,4 +479,14 @@ internal static partial class RabbitMqConsumerServiceLog
     [LoggerMessage(Level = LogLevel.Information,
         Message = "Queue {Queue} bound to exchange {Exchange} with routing key {RoutingKey}")]
     internal static partial void ExchangeBound(ILogger logger, string queue, string exchange, string routingKey);
+
+    [LoggerMessage(Level = LogLevel.Information,
+        Message = "Queue {Queue} declared with x-max-priority={MaxPriority}")]
+    internal static partial void QueuePriorityConfigured(ILogger logger, string queue, byte maxPriority);
+
+    [LoggerMessage(Level = LogLevel.Warning,
+        Message = "Queue {Queue} has x-max-priority={MaxPriority} which exceeds 10. "
+                + "Each priority level consumes additional broker memory even when unused. "
+                + "Consider using 10 or fewer levels.")]
+    internal static partial void QueuePriorityExceedsRecommendedLimit(ILogger logger, string queue, byte maxPriority);
 }

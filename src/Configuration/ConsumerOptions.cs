@@ -1,3 +1,4 @@
+using Messaging.Core.RabbitMq;
 using System.ComponentModel.DataAnnotations;
 
 namespace Messaging.Core.Configuration;
@@ -78,6 +79,12 @@ public sealed class ConsumerOptions : IValidatableObject
     /// </summary>
     [Range(1, 300)]
     public int ShutdownTimeoutSeconds { get; set; } = 30;
+
+    /// <summary>
+    /// Optional RabbitMQ-specific options for this consumer's queue declaration and registration.
+    /// Configure via <c>.WithRabbitMqOptions(mq => mq.WithMaxPriority(10)...)</c> on the builder.
+    /// </summary>
+    public RabbitMqConsumerOptions? RabbitMqOptions { get; set; }
 
     /// <summary>
     /// Resolved queue name — returns <see cref="QueueName"/> if explicitly set,

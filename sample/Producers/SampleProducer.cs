@@ -42,7 +42,7 @@ public sealed class SampleProducer(
                     message.MessageId,
                     message.Priority);
 
-                await publisher.PublishAsync(message, "sample-exchange", "sample-queue", stoppingToken);
+                await publisher.PublishAsync(message, "sample-exchange", "sample-queue", cancellationToken: stoppingToken);
 
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
 
@@ -50,7 +50,7 @@ public sealed class SampleProducer(
                     "Publishing HardMessage {MessageId}",
                     hardMessage.MessageId);
 
-                await publisher.PublishAsync(hardMessage, "sample-exchange", "ashwini-queue", stoppingToken);
+                await publisher.PublishAsync(hardMessage, "sample-exchange", "ashwini-queue", cancellationToken: stoppingToken);
 #pragma warning restore CA1873 // Avoid potentially expensive logging
             }
             catch (Exception ex)

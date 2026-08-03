@@ -17,11 +17,17 @@ public interface IMessagePublisher
     /// <param name="message">The message to publish.</param>
     /// <param name="exchangeName">Target exchange name.</param>
     /// <param name="routingKey">Routing key for exchange-based routing.</param>
+    /// <param name="options">
+    /// Optional per-publish options (e.g. message priority, extra headers).
+    /// Instantiate with <c>new <see cref="MessagePublishOptions"/>()</c> and chain
+    /// <c>With*</c> methods. Pass <c>null</c> to use defaults.
+    /// </param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task PublishAsync<TMessage>(
         TMessage message,
         string exchangeName,
         string routingKey,
+        MessagePublishOptions? options = null,
         CancellationToken cancellationToken = default)
         where TMessage : IMessage;
 
@@ -32,10 +38,16 @@ public interface IMessagePublisher
     /// <typeparam name="TMessage">Message type — must implement <see cref="IMessage"/>.</typeparam>
     /// <param name="message">The message to publish.</param>
     /// <param name="queueName">Target queue name.</param>
+    /// <param name="options">
+    /// Optional per-publish options (e.g. message priority, extra headers).
+    /// Instantiate with <c>new <see cref="MessagePublishOptions"/>()</c> and chain
+    /// <c>With*</c> methods. Pass <c>null</c> to use defaults.
+    /// </param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task PublishToQueueAsync<TMessage>(
         TMessage message,
         string queueName,
+        MessagePublishOptions? options = null,
         CancellationToken cancellationToken = default)
         where TMessage : IMessage;
 }
