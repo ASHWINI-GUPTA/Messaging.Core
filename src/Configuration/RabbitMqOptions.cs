@@ -34,6 +34,13 @@ public sealed class RabbitMqOptions
     [Required]
     public string Password { get; set; } = "guest";
 
+    /// <summary>
+    /// Connection name shown in the RabbitMQ management UI and broker logs
+    /// (<c>connection_name</c> client property), e.g. the service or pod name.
+    /// </summary>
+    [Required]
+    public string ClientName { get; set; } = string.Empty;
+
     /// <summary>Enable TLS for the AMQP connection.</summary>
     public bool UseSsl { get; set; } = false;
 

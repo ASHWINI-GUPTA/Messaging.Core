@@ -75,6 +75,7 @@ public sealed class RabbitMqConnection(IOptions<RabbitMqOptions> options, ILogge
         VirtualHost = _options.VirtualHost,
         UserName = _options.Username,
         Password = _options.Password,
+        ClientProvidedName = _options.ClientName,
         Ssl = _options.UseSsl
             ? new SslOption { Enabled = true, ServerName = _options.SslServerName ?? _options.Host }
             : new SslOption { Enabled = false },

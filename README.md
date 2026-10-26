@@ -266,7 +266,8 @@ Settings are bound from the `RabbitMq` and `Consumer` sections in `appsettings.j
     "Port": 5672,
     "VirtualHost": "/",
     "Username": "guest",
-    "Password": "guest"
+    "Password": "guest",
+    "ClientName": "order-service"
   },
   "Consumer": {
     "ExchangeName": "my-exchange",

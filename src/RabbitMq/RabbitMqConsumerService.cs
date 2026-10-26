@@ -229,12 +229,16 @@ public sealed class RabbitMqConsumerService<TMessage>(
                 autoDelete: false,
                 cancellationToken: cancellationToken);
 
-            // Declare DLQ bound to DLX
+            // Declare DLQ bound to DLX. It mirrors the main queue's type so that
+            // e.g. a quorum queue dead-letters into an equally replicated quorum DLQ.
             await _channel.QueueDeclareAsync(
                 queue: dlqName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
+                arguments: _options.RabbitMqOptions?.QueueType is { } queueType
+                    ? new Dictionary<string, object?> { ["x-queue-type"] = queueType }
+                    : null,
                 cancellationToken: cancellationToken);
 
             await _channel.QueueBindAsync(
