@@ -85,6 +85,10 @@ public sealed class RabbitMqConsumerOptions
     /// <summary>
     /// Sets the queue type (<c>x-queue-type</c>): <c>classic</c>, <c>quorum</c>, or <c>stream</c>.
     /// This argument is immutable — changing it after the queue is first declared causes a conflict.
+    /// <para>
+    /// When the dead-letter queue is enabled, the DLQ is declared with the same queue type,
+    /// so an existing DLQ of a different type must be deleted or migrated first.
+    /// </para>
     /// </summary>
     public RabbitMqConsumerOptions WithQueueType(string queueType)
     {
@@ -126,4 +130,6 @@ public sealed class RabbitMqConsumerOptions
     internal byte? ConsumerPriority { get; private set; }
     internal byte? MaxPriority =>
         _queueArgs.TryGetValue("x-max-priority", out var v) ? (byte)(int)v! : null;
+    internal string? QueueType =>
+        _queueArgs.TryGetValue("x-queue-type", out var v) ? v as string : null;
 }
