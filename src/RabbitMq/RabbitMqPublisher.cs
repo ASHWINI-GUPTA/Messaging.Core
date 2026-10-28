@@ -10,6 +10,9 @@ namespace Messaging.Core.RabbitMq;
 /// RabbitMQ implementation of <see cref="IMessagePublisher"/>.
 /// Serializes messages to JSON and publishes them to an exchange with a routing key,
 /// or directly to a queue via the default exchange.
+/// Publisher confirms are enabled: each publish completes only after the broker
+/// acknowledges the message, and throws <see cref="RabbitMQ.Client.Exceptions.PublishException"/>
+/// if the broker rejects it.
 /// Reuses the shared <see cref="IRabbitMqConnection"/> — a new channel is created per publish call
 /// to remain thread-safe (channels are not thread-safe in RabbitMQ.Client).
 /// </summary>
@@ -17,6 +20,10 @@ public sealed class RabbitMqPublisher(
     IRabbitMqConnection connection,
     ILogger<RabbitMqPublisher> logger) : IMessagePublisher
 {
+    private static readonly CreateChannelOptions ConfirmChannelOptions = new(
+        publisherConfirmationsEnabled: true,
+        publisherConfirmationTrackingEnabled: true);
+
     /// <inheritdoc />
     public async Task PublishAsync<TMessage>(
         TMessage message,
@@ -33,7 +40,7 @@ public sealed class RabbitMqPublisher(
         var body = SerializeMessage(message);
         var props = CreateBasicProperties<TMessage>(message, options);
 
-        await using var channel = await connection.CreateChannelAsync(cancellationToken);
+        await using var channel = await connection.CreateChannelAsync(ConfirmChannelOptions, cancellationToken);
 
         await channel.BasicPublishAsync(
             exchange: exchangeName,
@@ -60,7 +67,7 @@ public sealed class RabbitMqPublisher(
         var body = SerializeMessage(message);
         var props = CreateBasicProperties<TMessage>(message, options);
 
-        await using var channel = await connection.CreateChannelAsync(cancellationToken);
+        await using var channel = await connection.CreateChannelAsync(ConfirmChannelOptions,cancellationToken);
 
         await channel.BasicPublishAsync(
             exchange: string.Empty,
