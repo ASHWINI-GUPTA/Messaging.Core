@@ -206,7 +206,7 @@ public sealed class RabbitMqConsumerService<TMessage>(
 
     private async Task SetupTopologyAsync(CancellationToken cancellationToken)
     {
-        _channel = await connection.CreateChannelAsync(cancellationToken);
+        _channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
         // QoS — limits how many messages are delivered to this consumer before ACK
         await _channel.BasicQosAsync(

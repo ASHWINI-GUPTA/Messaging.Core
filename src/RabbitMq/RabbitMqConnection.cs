@@ -17,7 +17,7 @@ public interface IRabbitMqConnection : IAsyncDisposable
     bool IsConnected { get; }
 
     /// <summary>Creates a new channel on the shared connection. Caller owns the channel lifetime.</summary>
-    Task<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default);
+    Task<IChannel> CreateChannelAsync(CreateChannelOptions? options = null, CancellationToken cancellationToken = default);
 }
 
 /// <inheritdoc />
@@ -31,10 +31,10 @@ public sealed class RabbitMqConnection(IOptions<RabbitMqOptions> options, ILogge
     public bool IsConnected => _connection?.IsOpen == true;
 
     /// <inheritdoc />
-    public async Task<IChannel> CreateChannelAsync(CancellationToken cancellationToken = default)
+    public async Task<IChannel> CreateChannelAsync(CreateChannelOptions? options = null, CancellationToken cancellationToken = default)
     {
         await EnsureConnectedAsync(cancellationToken);
-        return await _connection!.CreateChannelAsync(cancellationToken: cancellationToken);
+        return await _connection!.CreateChannelAsync(options,cancellationToken: cancellationToken);
     }
 
     private async Task EnsureConnectedAsync(CancellationToken cancellationToken)
