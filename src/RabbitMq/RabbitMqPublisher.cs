@@ -67,7 +67,7 @@ public sealed class RabbitMqPublisher(
         var body = SerializeMessage(message);
         var props = CreateBasicProperties<TMessage>(message, options);
 
-        await using var channel = await connection.CreateChannelAsync(ConfirmChannelOptions,cancellationToken);
+        await using var channel = await connection.CreateChannelAsync(ConfirmChannelOptions, cancellationToken);
 
         await channel.BasicPublishAsync(
             exchange: string.Empty,
