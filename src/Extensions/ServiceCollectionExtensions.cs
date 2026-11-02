@@ -171,8 +171,8 @@ public static class ServiceCollectionExtensions
     /// <param name="activitySourceName">The name of the ActivitySource.</param>
     /// <param name="activitySourceVersion">The version of the ActivitySource.</param>
     public static OpenTelemetryBuilder AddConsumerTracing(
-        this OpenTelemetryBuilder builder, 
-        string activitySourceName, 
+        this OpenTelemetryBuilder builder,
+        string activitySourceName,
         string activitySourceVersion = "1.0.0")
     {
         Observability.ConsumerActivitySource.Initialize(activitySourceName, activitySourceVersion);

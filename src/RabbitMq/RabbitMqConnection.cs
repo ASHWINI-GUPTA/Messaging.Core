@@ -34,7 +34,7 @@ public sealed class RabbitMqConnection(IOptions<RabbitMqOptions> options, ILogge
     public async Task<IChannel> CreateChannelAsync(CreateChannelOptions? options = null, CancellationToken cancellationToken = default)
     {
         await EnsureConnectedAsync(cancellationToken);
-        return await _connection!.CreateChannelAsync(options,cancellationToken: cancellationToken);
+        return await _connection!.CreateChannelAsync(options, cancellationToken: cancellationToken);
     }
 
     private async Task EnsureConnectedAsync(CancellationToken cancellationToken)

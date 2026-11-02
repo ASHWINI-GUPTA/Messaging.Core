@@ -146,7 +146,7 @@ public sealed class RabbitMqConsumerService<TMessage>(
         // So at this point we know we're consuming, and if any gate is closed, we need to pause (cancel) the consumer.
         // If we started with consuming: false, then if a gate was closed at this point, we would fail to pause the consumer because we would skip the check for !allOpen && consuming.
         // By starting with consuming: true, we ensure that if any gate is closed at this point, we will correctly pause the consumer.
-        var consuming = true; 
+        var consuming = true;
 
         while (!cancellationToken.IsCancellationRequested)
         {
