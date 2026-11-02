@@ -1,5 +1,7 @@
+using Elastic.CommonSchema;
 using Messaging.Core.Extensions;
 using Messaging.Core.Pipeline;
+using Messaging.Core.RabbitMq;
 using Messaging.Sample.Gates;
 using Messaging.Sample.Models;
 using Messaging.Sample.Producers;
@@ -26,7 +28,11 @@ try
     // RabbitMQ Broker
     builder.Services
         .AddRabbitMqBroker(builder.Configuration)
-        .AddRabbitMqPublisher();
+        .AddRabbitMqPublisher(o =>
+        {
+            o.PublisherConfirmationsEnabled = true;
+            o.PublisherConfirmationTrackingEnabled = true;
+        });
 
     // Global pipeline behaviors (apply to ALL consumers)
     builder.Services

@@ -34,10 +34,23 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the RabbitMQ <see cref="IMessagePublisher"/> implementation.
+    /// Registers the RabbitMQ <see cref="IMessagePublisher"/> implementation and optionally
+    /// configures publisher-specific settings, including publisher confirmations and
+    /// confirmation tracking.
     /// </summary>
-    public static IServiceCollection AddRabbitMqPublisher(this IServiceCollection services)
+    /// <param name="services">The dependency injection service collection.</param>
+    /// <param name="configure">
+    /// An optional delegate to configure <see cref="RabbitMqPublisherOptions"/>.
+    /// If not specified, the default publisher configuration is used.
+    /// </param>
+    /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
+    public static IServiceCollection AddRabbitMqPublisher(
+        this IServiceCollection services,
+        Action<RabbitMqPublisherOptions>? configure = null)
     {
+        if (configure is not null)
+            services.Configure(configure);
+
         services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
         return services;
     }
