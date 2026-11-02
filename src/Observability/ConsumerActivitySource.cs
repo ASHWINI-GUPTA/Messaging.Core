@@ -10,7 +10,7 @@ namespace Messaging.Core.Observability;
 public static class ConsumerActivitySource
 {
     private static ActivitySource _source = new("Messaging.Core", "1.0.0");
-    
+
     /// <summary>
     /// Initializes the ActivitySource with a custom name provided by the implementer.
     /// </summary>

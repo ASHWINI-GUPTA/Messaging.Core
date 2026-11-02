@@ -26,7 +26,11 @@ try
     // RabbitMQ Broker
     builder.Services
         .AddRabbitMqBroker(builder.Configuration)
-        .AddRabbitMqPublisher();
+        .AddRabbitMqPublisher(o =>
+        {
+            o.PublisherConfirmationsEnabled = true;
+            o.PublisherConfirmationTrackingEnabled = true;
+        });
 
     // Global pipeline behaviors (apply to ALL consumers)
     builder.Services

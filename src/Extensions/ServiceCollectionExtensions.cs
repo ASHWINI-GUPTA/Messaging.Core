@@ -34,10 +34,23 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the RabbitMQ <see cref="IMessagePublisher"/> implementation.
+    /// Registers the RabbitMQ <see cref="IMessagePublisher"/> implementation and optionally
+    /// configures publisher-specific settings, including publisher confirmations and
+    /// confirmation tracking.
     /// </summary>
-    public static IServiceCollection AddRabbitMqPublisher(this IServiceCollection services)
+    /// <param name="services">The dependency injection service collection.</param>
+    /// <param name="configure">
+    /// An optional delegate to configure <see cref="RabbitMqPublisherOptions"/>.
+    /// If not specified, the default publisher configuration is used.
+    /// </param>
+    /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
+    public static IServiceCollection AddRabbitMqPublisher(
+        this IServiceCollection services,
+        Action<RabbitMqPublisherOptions>? configure = null)
     {
+        if (configure is not null)
+            services.Configure(configure);
+
         services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
         return services;
     }
@@ -158,8 +171,8 @@ public static class ServiceCollectionExtensions
     /// <param name="activitySourceName">The name of the ActivitySource.</param>
     /// <param name="activitySourceVersion">The version of the ActivitySource.</param>
     public static OpenTelemetryBuilder AddConsumerTracing(
-        this OpenTelemetryBuilder builder, 
-        string activitySourceName, 
+        this OpenTelemetryBuilder builder,
+        string activitySourceName,
         string activitySourceVersion = "1.0.0")
     {
         Observability.ConsumerActivitySource.Initialize(activitySourceName, activitySourceVersion);
