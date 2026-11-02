@@ -1,7 +1,5 @@
-using Elastic.CommonSchema;
 using Messaging.Core.Extensions;
 using Messaging.Core.Pipeline;
-using Messaging.Core.RabbitMq;
 using Messaging.Sample.Gates;
 using Messaging.Sample.Models;
 using Messaging.Sample.Producers;
