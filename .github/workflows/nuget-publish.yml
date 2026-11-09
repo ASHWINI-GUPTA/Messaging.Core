@@ -11,6 +11,9 @@ env:
 
 jobs:
   build_and_publish:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     
     steps:
